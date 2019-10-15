@@ -5,6 +5,8 @@ JSON files are difficult to read from, especially without a JSON parser.
 
 Thus I made a program which will allow the user to store JSON files into a certain directory (InputFiles) and run the program. The program would simplify these JSON files in order to make them easier to read with a program later on, then it would save these output files into a different directory (OutputFiles).
 
+### Program allows storing & converting any number of JSON files at once! Just store them all in the "InputFiles" directory.
+
 ## Example Input File (.json):
 	{
 	  "type": "minecraft:crafting_shaped",
@@ -40,23 +42,23 @@ Thus I made a program which will allow the user to store JSON files into a certa
 	"minecraft:acacia_boat"
 
 ## Requirements to Run:
-For Windows:
-	- Make sure you have Windows Sub Linux (WSL) set up. If you don't know what that is and you're using Windows, I'm not sure if/how you can run this.
-	- Type "bash" in terminal.
-	- Open the correct path in terminal by typing: "cd <yourPath>"
-		* For example: cd Downloads\json_file_simplifier
-	- Type: "./a.out" (without the quotes)
-	- The program will run in terminal. Follow the instructions then input 'y' and hit Enter when ready.
-	- The program will simplify all json files stored in the "InputFiles" directory and output their simplified versions to the "OutputFiles" directory.
-	
-For Linux:
-	- Open terminal.
-	- Type: "./a.out" (without the quotes)
-	- The program will run in terminal. Follow the instructions then input 'y' and hit Enter when ready.
-	- The program will simplify all json files stored in the "InputFiles" directory and output their simplified versions to the "OutputFiles" directory.
-	
-For MAC:
-	- No idea if it is possible or not as I've never used MAC before.
+	For Windows:
+		- Make sure you have Windows Sub Linux (WSL) set up. If you don't know what that is and you're using Windows, I'm not sure if/how you can run this.
+		- Type "bash" in terminal.
+		- Open the correct path in terminal by typing: "cd <yourPath>"
+			* For example: cd Downloads\json_file_simplifier
+		- Type: "./a.out" (without the quotes)
+		- The program will run in terminal. Follow the instructions then input 'y' and hit Enter when ready.
+		- The program will simplify all json files stored in the "InputFiles" directory and output their simplified versions to the "OutputFiles" directory.
+		
+	For Linux:
+		- Open terminal.
+		- Type: "./a.out" (without the quotes)
+		- The program will run in terminal. Follow the instructions then input 'y' and hit Enter when ready.
+		- The program will simplify all json files stored in the "InputFiles" directory and output their simplified versions to the "OutputFiles" directory.
+		
+	For MAC:
+		- No idea if it is possible or not as I've never used MAC before.
 
 ## Requirements for Compiling the Program Yourself:
 - A C++ compiler that supports C++17 features.
