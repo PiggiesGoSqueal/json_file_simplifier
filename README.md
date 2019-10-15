@@ -6,38 +6,38 @@ JSON files are difficult to read from, especially without a JSON parser.
 Thus I made a program which will allow the user to store JSON files into a certain directory (InputFiles) and run the program. The program would simplify these JSON files in order to make them easier to read with a program later on, then it would save these output files into a different directory (OutputFiles).
 
 ## Example Input File (.json):
-{
-  "type": "minecraft:crafting_shaped",
-  "group": "boat",
-  "pattern": [
-    "# #",
-    "###"
-  ],
-  "key": {
-    "#": {
-      "item": "minecraft:acacia_planks"
-    }
-  },
-  "result": {
-    "item": "minecraft:acacia_boat"
-  }
-}
+	{
+	  "type": "minecraft:crafting_shaped",
+	  "group": "boat",
+	  "pattern": [
+		"# #",
+		"###"
+	  ],
+	  "key": {
+		"#": {
+		  "item": "minecraft:acacia_planks"
+		}
+	  },
+	  "result": {
+		"item": "minecraft:acacia_boat"
+	  }
+	}
 
 ## Example Output File (.txt):
-"type"
-"minecraft:crafting_shaped"
-"group"
-"boat"
-"pattern"
-"# #"
-"###"
-"key"
-"#"
-"item"
-"minecraft:acacia_planks"
-"result"
-"item"
-"minecraft:acacia_boat"
+	"type"
+	"minecraft:crafting_shaped"
+	"group"
+	"boat"
+	"pattern"
+	"# #"
+	"###"
+	"key"
+	"#"
+	"item"
+	"minecraft:acacia_planks"
+	"result"
+	"item"
+	"minecraft:acacia_boat"
 
 ## Requirements to Run:
 	For Windows:
