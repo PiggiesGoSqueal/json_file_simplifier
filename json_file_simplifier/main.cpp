@@ -8,12 +8,12 @@ Project Purpose:
 
 Program Name: main.cpp
 Author: Tommy Weber
-Date: 10/15/2019
+Date: 10/16/2019
 
-Latest Changes on 10/15/2019:
-    - Added a way to store number characters that aren't in double quotes but are number(s). Example:
-        * "count": 3
-        * "id" 335
+Latest Changes / Notes:
+    - On 10/15/2019 I added support for storing integers that are outside of double quotes.
+    - On 10/16/2019 I added support for storing doubles (like 0.0) that are outside of double quotes.
+    - Algorithm Steps may not be fully up to date with latest changes.
 
 -------------------------------
 Follow Good Practices:
@@ -94,6 +94,7 @@ void printInstructionsAndGetInput() {
     
     char ready = 'n';
     std::cin >> ready;
+    std::cout << '\n';
     if (ready != 'y' && ready != 'Y') {
         std::cout << "Program has ended. You may now close the program.\n";
         exit(0);
@@ -173,81 +174,93 @@ void readInputFile(const std::string &filename, std::vector<std::string> &alphaN
         }
 
         // 3.
-        char c = ' ';
-        std::string word;
-        int countOfQuotes = 0;
-        bool charIsNumOutsideQuotes = false;
-        std::string numStr;
-        bool prevCharWasNum = false;
+        char c;
+        std::string alphaNum;
+        bool quoteBlockStarted = false;
+        bool numStarted = false;
+        bool numHasDecimalAlready = false;
 
         // 4.
+        /*
+        Goal:
+            - Anything inside " " should be saved.
+            - Any integer numbers outside of " " should be saved. Examples: 30 or 334
+            - Any double numbers outside of " " should be saved. Examples: 3.14 or 55.12
+        */
+        // CODE CURRENTLY CHECKS EVERY CHAR OF FILE ONE AT A TIME.
         while (inFile.get(c)) {
-            // 4a. & 4c.
-            if (c == '"') {
-                ++countOfQuotes;
-            }
-            // 4b.
-            if (countOfQuotes == 1) {
-                word += c;
-            }
-            // 4d.
-            else if (countOfQuotes >= 2) {
-                word += c;
-                // Add word to the vec (Ex: "minecraft:stone" WITH the "" symbols)
-                alphaNums.push_back(word);
-                countOfQuotes = 0; // Resets quote count.
-                word = ""; // Resets the word variable.
+            // Program does not support adding numbers that are like: .23, only 0.23
+            // STARTING NUM HANDLER:
+            if (quoteBlockStarted == false && (std::isdigit(c)) && numStarted == false) {
+                numStarted = true; // Shows the previous char was a num too, and thus is still adding digits to alphaNum to equal 1 number of multiple digits.
+                alphaNum += c;
             }
 
-            /*
-            NOTE: Apologies if this area is a bit confusing. Was difficult to put into English. Mainly read the goal and you'll know what I wanted to do.
-
-            Goal:
-                - The old code (from 10/(13 or 14)/2019) would simplify JSON files so anything inside double quotes is saved while everything else is not. However, this causes a problem because I WANT numbers OUTSIDE of single quotes to be saved as well. This proves difficult though because a number can be multi-digit and we are checking by single characters. Thus we would keep track of:
-                    * if the checked char is a number.
-                        - if so, keep track of how many following chars are nums.
-                        - once the current char is no longer a num, save the string of num digits and reset the string keeping track of nums.
-
-                - In short, the goal is to support storing numbers (that are outside double quotation marks) into the vector as a string, even if it's a multi digit number (ex: 144).
-
-            Algorithm Steps:
-                1. If the char being checked IS a number and IS outside of a set of " " symbols, then set a flag (bool) variable to true to notify that there IS a number char outside of quotes.
-                    - This will help us determine whether following characters are number digits too (and thus are all one multi-digit number) OR if that number char was alone.
-                        * For example, let's say the line says: "type" : "minecraft:crafting" { "count" 345 }
-                        * Then program would store into the vec: "type", "minecraft:crafting", and "count". Then it would check 3, see it's a num outside quotation marks, check the next char and see it is also a num, check the next char and see it is also a num. Then it would add all 3 chars to a str and add that to the vec as: 345 (no quotation marks b/c there were none).
-
-                2+. <Refer to comments below>. Easier than trying to remake them up here I think.
-            */
-            // 1.
-            // If char is a number & is outside of quotes, then it will set bool value to true to keep track of it and try to determine if it is a single number or double+ digit number.
-            // Then once it has gotten all the digits, it will push it to the vec.
-            if (std::isdigit(c) && countOfQuotes == 0) {
-                // if char is a number and the immediately previous char was ALSO a number (which is why bool value is already set to true) then add char to numStr.
-                if (charIsNumOutsideQuotes == true) {
-                    numStr += c;
+            // NUM ALREADY STARTED HANDLER:
+            else if (quoteBlockStarted == false && (std::isdigit(c) || c == '.') && numStarted == true) {          
+                // add num or decimal to alphaNum:
+                // - add decimal to alphaNum:
+                //   * Makes sure it is not adding a second decimal to a number that already has one.
+                if (c == '.' && numHasDecimalAlready == false) {
+                    alphaNum += c;
+                    numHasDecimalAlready = true; // preps for next iteration
                 }
-                // else if the previous char was NOT a number (so bool value is false) then that means this is first char in a row that is a num. So, set bool value to true and add value to fresh numStr variable.
-                else if (charIsNumOutsideQuotes == false) {
-                    numStr = c; // wipes whatever was in str and sets it to char.
-                    charIsNumOutsideQuotes = true;
+                // if it looks like: 55... and we're at the 2nd decimal so alphaNum = 55. atm, then remove the dot.
+                else if (c == '.' && numHasDecimalAlready == true) {
+                    alphaNum.resize(alphaNum.size()-1);
                 }
-                prevCharWasNum = true; // Preps for next loop.
+                // - add num to alphaNum:
+                else if (std::isdigit(c)) {
+                    alphaNum += c;
+                }
             }
-            // if previous char was a num but this char is NOT a num, then add the numStr of the previous char number(s) to the vec as it's count of digits is over. Then reset numStr.
-            if (prevCharWasNum && !std::isdigit(c)) {
-                alphaNums.push_back(numStr);
-                numStr = ""; // Resets numStr
-                prevCharWasNum = false; // Preps for next loop now that char is no longer a num.
+
+            // NUM ENDED HANDLER & CHECKING CHAR FOR QUOTE HANDLER (WHEN NUM HAS JUST ENDED):
+            else if (quoteBlockStarted == false && (!std::isdigit(c) || c != '.') && numStarted == true) {
+                alphaNums.push_back(alphaNum);
+                // Resets:
+                alphaNum = "";
+                numStarted = false;
+                numHasDecimalAlready = false;
+
+                // Checks if current char is a " symbol.
+                // - If so, will add it to alphaNum and change quoteBlockStarted to true.
+                if (c == '"') {
+                    alphaNum += c;
+                    quoteBlockStarted = true;
+                }
             }
-            
-            
+
+            // STARTING QUOTE HANDLER:
+            else if (quoteBlockStarted == false && c == '"') {
+                alphaNum += c;
+                quoteBlockStarted = true;
+            }
+            // DURING QUOTE HANDLER (has not reached end of quote yet):
+            else if (quoteBlockStarted == true && c != '"') {
+                alphaNum += c;
+            }
+            // QUOTE ENDED HANDLER:
+            else if (quoteBlockStarted == true && c == '"') {
+                alphaNum += c;
+                alphaNums.push_back(alphaNum);
+                
+                // Resets:
+                alphaNum = "";
+                quoteBlockStarted = false;
+            }
         }
-        
+
+        /*
+        // DEBUG Testing - Print Vector Contents
+        std::cout << "[DEBUG] alphaNums = \n";
+        for (std::string str : alphaNums) {
+            std::cout << str << "\n";
+        }
+        */
+
         // Closes File:
         inFile.close();
-
-        // Note:
-        // - As soon as loop ends there will be a vec full of the words with no special symbols except the symbols inside a word like: minecraft:diamond or double quotes.
 }
 
 /*
@@ -286,8 +299,8 @@ void writeToOutputFile(std::string filename, const std::vector<std::string> &alp
     }
 
     // 4.
-    for (std::string wordStr : alphaNums) {
-        outFile << wordStr << std::endl;
+    for (std::string str : alphaNums) {
+        outFile << str << std::endl;
     }
 
     // 5.
