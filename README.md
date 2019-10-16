@@ -7,6 +7,10 @@ Thus I made a program which will allow the user to store JSON files into a certa
 
 ### Program allows storing & converting any number of JSON files at once! Just store them all in the "InputFiles" directory.
 
+## Planned Features:
+- Make it run faster / more efficiently
+- Allow it to recursively find input files within the "InputFiles" directory. And recursively write output files in the "OutputFiles" directory. That way, I could just add the "1.13" and "1.14" folders (with all MC recipe files in them) into "InputFiles" and have it do all of them in one run of the program. Would save time.
+
 ## Example Input File (.json):
 	{
 	  "type": "minecraft:crafting_shaped",
@@ -24,11 +28,19 @@ Thus I made a program which will allow the user to store JSON files into a certa
 		"item": "minecraft:oak_wood",
 		"count": 333
 		"444"
+		8910
+		"91"23
 		55"66"
+		...
 		{999:}
+		100...
+		22
+		.33
+		{0.43}
+		2.85
 	  }
 	}
-Notice that there are some lines that are not in JSON format. These are just to point out the differences in output between "444" and 55"66" lines for example. Anything that is inside double quotes will remain in double quotes in the output while anything outside double quotes will continue to have no double quotes in the output. Then the {999:} line demonstrates how it will still print only the numbers in the output file instead of {999:}
+Notice that there are some lines that are not in JSON format. These are just to point out the differences in output between for differently formatted number lines. Anything that is inside double quotes will remain in double quotes in the output while anything outside double quotes will continue to have no double quotes in the output.
 
 ## Example Output File (.txt):
 	"type"
@@ -48,9 +60,17 @@ Notice that there are some lines that are not in JSON format. These are just to 
 	"count"
 	333
 	"444"
+	8910
+	"91"
+	23
 	55
 	"66"
 	999
+	10
+	22
+	33
+	0.43
+	2.85
 
 ## Requirements to Run:
 	For Windows:
@@ -74,10 +94,6 @@ Notice that there are some lines that are not in JSON format. These are just to 
 ## Requirements for Compiling the Program Yourself:
 - A C++ compiler that supports C++17 features.
 - Windows with WSL or Linux I think.
-	
-## How I could improve this program in the future:
-- Make it run faster / more efficiently
-- Allow it to recursively find input files within the "InputFiles" directory. And recursively write output files in the "OutputFiles" directory. That way, I could just add the "1.13" and "1.14" folders (with all MC recipe files in them) into "InputFiles" and have it do all of them in one run of the program. Would save time.
 
 ## Other Information:
 - The date of creating this program was 10/13/2019 and is intended to be used with my Anti-Shop-Exploits program to convert JSON files to easier to read files that can be read by the program. With the way I intend to use it, I will only need to run this program once per Minecraft version that comes out (1.13, 1.14, 1.15, etc) then I can just store the output files into the Anti-Shop-Exploits directory recipes section.	
