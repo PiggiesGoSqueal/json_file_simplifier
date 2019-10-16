@@ -8,29 +8,48 @@ Project Purpose:
 
 Program Name: main.cpp
 Author: Tommy Weber
-Date: 10/13/2019
+Date: 10/15/2019
+
+Latest Changes on 10/15/2019:
+    - Added a way to store number characters that aren't in double quotes but are number(s). Example:
+        * "count": 3
+        * "id" 335
+
 -------------------------------
 Follow Good Practices:
     1. Use algorithm steps (in English) first.
     2. Use compiler flags. 
     3. Use static analyzers to test for bugs.
     4. Use >> and << when dividing and multiplying by 2. Find the file that explains it.
-    5. 
-
-
-MAYBE CONVERT FILES TO .txt AFTER MODIFYING THEM AS THEY ARE NO LONGER JSON FORMAT!!
+    5. ...
 
 Algorithm Steps:
-    1. Tell user to input the desired files to be converted into the "convert" folder path.
+    1. Tell user to input the desired files to be converted into the "InputFiles" folder path.
         - Tell user to input 'Y' when ready or 'n' to exit.
-    2. Open all files one at a time in the file path with the "convert" folder.
-    3. In each file, read all of the lines until EOF then have extract all symbols from file, while leaving letters and numbers (a-z, A-Z, 0-9)
-    4. Save file, close it, and move onto next.
-        - Repeat until no more files in directory.
-    5. Tell user program has finished converting files and they may not safely close the program.
-    6. Try creating a .exe file for this so people can easily run it?
-    6. Post to Github as pinkpig3777(?), be sure Author is changed to my github name. Make it public.
-        - Add a README.md with info on what the program does and how to run it and any requirements / a tutorial on how to use it.
+    2. Open all files one at a time in the file path with the "InputFiles" folder.
+    ---
+    For Each File:
+    3. In each file, read each char and keep track of where there are:
+        a. Double quotes
+            - We will save everything within double quotes.
+            - Example: "minecraft:type"
+        b. Numbers
+            - We will save all numbers in the file (even if they are outside double quotes).
+    4. Store everything that matches what we want in #3 into a vector of alphabetical & number contents.
+    5. Close input file.
+    5. Create an output file in "OutputFiles" with same name but .txt extension instead of .json.
+    6. In output file write each item in the vector to the file in a new line.
+        - Example vector: {""type"", ""minecraft:crafting_shaped"", ""group"", ""bark"", "333", ""444""}
+        - Writing example vector to file:
+            "type"
+            "minecraft:crafting_shaped"
+            "group"
+            "bark"
+            333
+            "444"
+    7. Close output file.
+    ---
+    8. Tell user program has finished converting files and they may now safely close the program.
 
 HOW TO COMPILE:
     $ cppcheck --enable=all main.cpp
@@ -157,6 +176,9 @@ void readInputFile(const std::string &filename, std::vector<std::string> &alphaN
         char c = ' ';
         std::string word;
         int countOfQuotes = 0;
+        bool charIsNumOutsideQuotes = false;
+        std::string numStr;
+        bool prevCharWasNum = false;
 
         // 4.
         while (inFile.get(c)) {
@@ -176,6 +198,49 @@ void readInputFile(const std::string &filename, std::vector<std::string> &alphaN
                 countOfQuotes = 0; // Resets quote count.
                 word = ""; // Resets the word variable.
             }
+
+            /*
+            NOTE: Apologies if this area is a bit confusing. Was difficult to put into English. Mainly read the goal and you'll know what I wanted to do.
+
+            Goal:
+                - The old code (from 10/(13 or 14)/2019) would simplify JSON files so anything inside double quotes is saved while everything else is not. However, this causes a problem because I WANT numbers OUTSIDE of single quotes to be saved as well. This proves difficult though because a number can be multi-digit and we are checking by single characters. Thus we would keep track of:
+                    * if the checked char is a number.
+                        - if so, keep track of how many following chars are nums.
+                        - once the current char is no longer a num, save the string of num digits and reset the string keeping track of nums.
+
+                - In short, the goal is to support storing numbers (that are outside double quotation marks) into the vector as a string, even if it's a multi digit number (ex: 144).
+
+            Algorithm Steps:
+                1. If the char being checked IS a number and IS outside of a set of " " symbols, then set a flag (bool) variable to true to notify that there IS a number char outside of quotes.
+                    - This will help us determine whether following characters are number digits too (and thus are all one multi-digit number) OR if that number char was alone.
+                        * For example, let's say the line says: "type" : "minecraft:crafting" { "count" 345 }
+                        * Then program would store into the vec: "type", "minecraft:crafting", and "count". Then it would check 3, see it's a num outside quotation marks, check the next char and see it is also a num, check the next char and see it is also a num. Then it would add all 3 chars to a str and add that to the vec as: 345 (no quotation marks b/c there were none).
+
+                2+. <Refer to comments below>. Easier than trying to remake them up here I think.
+            */
+            // 1.
+            // If char is a number & is outside of quotes, then it will set bool value to true to keep track of it and try to determine if it is a single number or double+ digit number.
+            // Then once it has gotten all the digits, it will push it to the vec.
+            if (std::isdigit(c) && countOfQuotes == 0) {
+                // if char is a number and the immediately previous char was ALSO a number (which is why bool value is already set to true) then add char to numStr.
+                if (charIsNumOutsideQuotes == true) {
+                    numStr += c;
+                }
+                // else if the previous char was NOT a number (so bool value is false) then that means this is first char in a row that is a num. So, set bool value to true and add value to fresh numStr variable.
+                else if (charIsNumOutsideQuotes == false) {
+                    numStr = c; // wipes whatever was in str and sets it to char.
+                    charIsNumOutsideQuotes = true;
+                }
+                prevCharWasNum = true; // Preps for next loop.
+            }
+            // if previous char was a num but this char is NOT a num, then add the numStr of the previous char number(s) to the vec as it's count of digits is over. Then reset numStr.
+            if (prevCharWasNum && !std::isdigit(c)) {
+                alphaNums.push_back(numStr);
+                numStr = ""; // Resets numStr
+                prevCharWasNum = false; // Preps for next loop now that char is no longer a num.
+            }
+            
+            
         }
         
         // Closes File:

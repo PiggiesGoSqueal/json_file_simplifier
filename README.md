@@ -10,36 +10,47 @@ Thus I made a program which will allow the user to store JSON files into a certa
 ## Example Input File (.json):
 	{
 	  "type": "minecraft:crafting_shaped",
-	  "group": "boat",
+	  "group": "bark",
 	  "pattern": [
-		"# #",
-		"###"
+		"##",
+		"##"
 	  ],
 	  "key": {
 		"#": {
-		  "item": "minecraft:acacia_planks"
+		  "item": "minecraft:oak_log"
 		}
 	  },
 	  "result": {
-		"item": "minecraft:acacia_boat"
+		"item": "minecraft:oak_wood",
+		"count": 333
+		"444"
+		55"66"
+		{999:}
 	  }
 	}
+Notice that there are some lines that are not in JSON format. These are just to point out the differences in output between "444" and 55"66" lines for example. Anything that is inside double quotes will remain in double quotes in the output while anything outside double quotes will continue to have no double quotes in the output. Then the {999:} line demonstrates how it will still print only the numbers in the output file instead of {999:}
 
 ## Example Output File (.txt):
 	"type"
 	"minecraft:crafting_shaped"
 	"group"
-	"boat"
+	"bark"
 	"pattern"
-	"# #"
-	"###"
+	"##"
+	"##"
 	"key"
 	"#"
 	"item"
-	"minecraft:acacia_planks"
+	"minecraft:oak_log"
 	"result"
 	"item"
-	"minecraft:acacia_boat"
+	"minecraft:oak_wood"
+	"count"
+	333
+	"444"
+	55
+	"66"
+	999
 
 ## Requirements to Run:
 	For Windows:
