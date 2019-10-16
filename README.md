@@ -75,9 +75,12 @@ Notice that there are some lines that are not in JSON format. These are just to 
 - A C++ compiler that supports C++17 features.
 - Windows with WSL or Linux I think.
 	
+## How I could improve this program in the future:
+- Make it run faster / more efficiently
+- Allow it to recursively find input files within the "InputFiles" directory. And recursively write output files in the "OutputFiles" directory. That way, I could just add the "1.13" and "1.14" folders (with all MC recipe files in them) into "InputFiles" and have it do all of them in one run of the program. Would save time.
+
 ## Other Information:
-- The date of creating this program was 10/13/2019 and is intended to be used with my Anti-Shop-Exploits program to convert JSON files to easier to read files that can be read by the program. With the way I intend to use it, I will only need to run this program once per Minecraft version that comes out (1.13, 1.14, 1.15, etc) then I can just store the output files into the Anti-Shop-Exploits directory recipes section.
-	
+- The date of creating this program was 10/13/2019 and is intended to be used with my Anti-Shop-Exploits program to convert JSON files to easier to read files that can be read by the program. With the way I intend to use it, I will only need to run this program once per Minecraft version that comes out (1.13, 1.14, 1.15, etc) then I can just store the output files into the Anti-Shop-Exploits directory recipes section.	
 
 # Terms of Use
 - You may run the program for your own needs, as well as, modify it. 
