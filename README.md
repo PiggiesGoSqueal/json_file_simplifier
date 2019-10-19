@@ -9,7 +9,9 @@ Thus I made a program which will allow the user to store JSON files into a certa
 
 ## Planned Features:
 - Make it run faster / more efficiently
-- Allow it to recursively find input files within the "InputFiles" directory. And recursively write output files in the "OutputFiles" directory. That way, I could just add the "1.13" and "1.14" folders (with all MC recipe files in them) into "InputFiles" and have it do all of them in one run of the program. Would save time.
+- V2: ~~Add support for storing doubles (like 0.0) that are outside of double quotes.~~
+- V3: ~~Allow it to recursively find input files within the "InputFiles" directory. And recursively write output files in the "OutputFiles" directory.
+	* That way, I could just add the "1.13" and "1.14" folders (with all MC recipe files in them) into "InputFiles" and have it do all of them in one run of the program. Would save time.~~
 
 ## Example Input File (.json):
 	{
