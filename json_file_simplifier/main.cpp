@@ -21,15 +21,17 @@ Follow Good Practices:
     2. Use compiler flags. 
     3. Use static analyzers to test for bugs.
     4. Use >> and << when dividing and multiplying by 2. Find the file that explains it.
-    5. Etc...
+    5. A function should only do one thing, not two (like printInstructionsAndGetInput() is bad) 
+    6. Make sure function names are specific to EXACTLY what it does. openFiles() is not correct for something that iterates through a directory recursively
+    #. Etc...
 
 Overall Algorithm Steps: (Not numbered in code like other algorithm steps are)
-    1. Tell user to input the desired files to be converted into the "InputFiles" folder path.
-        - Tell user to input 'Y' when ready or 'n' to exit.
-        - Done in printInstructionsAndGetInput()
+    1.
+        a. Tell user to input the desired files to be converted into the "InputFiles" folder path. Done in printInstructions()
+        b. Tell user to input 'Y' when ready or 'n' to exit. Done in getUserConfirmation()
 
     2. Open all files one at a time in the file path with the "InputFiles" folder.
-        - Done in openFiles()
+        - Done in iterateInDirectory()
 
     ---
     For Each File (#3-#8):
@@ -72,18 +74,22 @@ HOW TO COMPILE:
 #include <fstream>
 #include <filesystem>
 #include <vector> // for storing words from json file and writing them to output files.
+#include <regex> // std::regex_replace() & std::regex()
 
 namespace fs = std::filesystem; // for convenience
 
-void printInstructionsAndGetInput();
-void openFiles();
-void readInputFile(const std::string &entryStr, std::vector<std::string> &alphaNums); // child function of openFiles().
-void writeToOutputFile(std::string &outputEntryStr, const std::vector<std::string> &alphaNums); // child function of openFiles().
+void printInstructions(const int width);
+void getUserConfirmation(const int width); // confirms user has followed instructions & program can parse files
+void iterateInDirectory(); // Recursively iterate through the filesystem "InputFiles" directory
+void parseJsonFile(const fs::path &inputFilePath, std::vector<std::string> &alphaNums); 
+void writeJsonAsTxt(const fs::path &outputFilePath, const std::vector<std::string> &alphaNums);
 
 int main() {
-    printInstructionsAndGetInput(); 
+    const int printWidth = 50; // the num of '-' or '=' in a line output to terminal
+    printInstructions(printWidth); 
+    getUserConfirmation(printWidth);
 
-    openFiles();
+    iterateInDirectory();
 
     std::cout << "The program has completed successfully!\n";
     
@@ -91,8 +97,7 @@ int main() {
 }
 
 
-void printInstructionsAndGetInput() {
-    const int width = 50;
+void printInstructions(const int width) {
     const char sym = '-';
 
     std::cout << std::setfill(sym) << std::setw(width) << "\n"
@@ -102,9 +107,12 @@ void printInstructionsAndGetInput() {
         << '\n'
         << "Usage Steps:\n"
         << "1. To get started, open the file path this program is located at on your computer.\n"
-        << "2. Now move the desired files you would like to simplify into the " << std::quoted("InputFiles") << " directory.\n"
-        << "3. Input 'y' when ready or input 'n' to quit: "
-        << std::setw(width) << std::setfill(' ');
+        << "2. Now move the desired files you would like to simplify into the " << std::quoted("InputFiles") << " directory.\n";
+}
+
+void getUserConfirmation(const int width) {
+    std::cout << "3. Input 'y' when ready or input 'n' to quit: "
+              << std::setw(width) << std::setfill(' ');
     
     char ready = 'n';
     std::cin >> ready;
@@ -121,56 +129,49 @@ Algorithm Steps of this Function:
         - Make sure it includes the current path and InputFiles directory.
 
     2. For each file (recursively) in the InputFiles directory:
-        a. Create a string called outputEntryStr & set it to the entry path.
-        b. Check if entry is a directory file type. If so, we want to replace "Input" with "Output" in the ouputEntryStr so later we can create these directories in the "OutputFiles" folder. To do this:
-            * Find the position of the 'I' in "InputFiles" in the outputEntryStr then set an int variable to this position.
-            * Replace "Input" with "Output" in the outputEntryStr so the total path now looks like this example: /mnt/c/Users/Tom/Desktop/json_file_simplifier/OutputFiles/1_13
-            * Now check if the outputEntryStr path exists because that's where we will write output files to. If it doesn't exist, create it.
-        c. Create a string called entryStr & set it to the entry path.
-    d. Check if entryStr is a regular file. If so:
-            * Create an empty vec called alphaNums which will contain all words and numbers for a SINGLE file at a time.
-            * Call readInputFile()
-            * Call writeToOutputFile()
+        a. Create 2 path variables that both equal entry variable:
+            - inputFilePath
+                * Have this equal entry.
+            - outputFilePath
+                * Have this equal entry but replace "InputFiles" part with "OutputFiles". We do this using #include <regex> code.
+        b. Check if entry is a directory file type.
+            - If it is, check if the outputFilePath exists already (such as the 1_13 folder inside InputFiles path). If the directories don't already exist, create them.
+        c. Check if inputFilePath is a regular file (as opposed to a directory or symlink). If so:
+            - Create an empty vec called alphaNums which will contain all words and numbers for a SINGLE file at a time.
+            - Call parseJsonFile()
+            - Because the file path is a regular file, we will need to replace the output file path's extension with "txt" before calling writeJsonAsTxt()
+            - Call writeJsonAsTxt()
 */
-void openFiles() {
+void iterateInDirectory() {
     // 1.
     fs::path fullInPath = fs::current_path();
     fullInPath /= "InputFiles";
 
     // 2.
-    // Note: This for loop line is not my code, got it from a guide. Idk how to do it in my own code.
-    for (auto entry = fs::recursive_directory_iterator(fullInPath);
-              entry != fs::recursive_directory_iterator(); // (entry does not equal no entry, similar to EOF)
-              ++entry ) { // iterate to next entry
-        
-        // --------------------------
-        // outputEntryStr section:
-        // --------------------------
+    for (auto &entry : fs::recursive_directory_iterator(fullInPath)) {
         // 2a.
-        std::string outputEntryStr = entry->path().string();
-        int inputPosInEntry = outputEntryStr.find("InputFiles");
-        outputEntryStr.replace(outputEntryStr.begin()+inputPosInEntry, outputEntryStr.begin()+inputPosInEntry+2, "Out");
-        
+        fs::path inputFilePath = entry; // Ex 1: /mnt/c/Users/Tom/Desktop/json_file_simplifier/InputFiles/1_13
+                                        // Ex 2: /mnt/c/Users/Tom/Desktop/json_file_simplifier/InputFiles/1_13/acacia_boat.json
+        fs::path outputFilePath = std::regex_replace(inputFilePath.string(), std::regex("InputFiles"), "OutputFiles");
+                                        // Ex 1: /mnt/c/Users/Tom/Desktop/json_file_simplifier/OutputFiles/1_13
+                                        // Ex 2: /mnt/c/Users/Tom/Desktop/json_file_simplifier/OutputFiles/1_13/acacia_boat.json
+
         // 2b.
-        if (entry->is_directory()) {
-            if (!fs::exists(outputEntryStr)) {
-                fs::create_directories(outputEntryStr);
+        if (entry.is_directory()) {
+            if (!fs::exists(outputFilePath)) {
+                fs::create_directories(outputFilePath);
             }
         }
 
-        // ----------------------
-        // entryStr section:
-        // ----------------------
         // 2c.
-        std::string entryStr = entry->path().string(); // Ex 1: /mnt/c/Users/Tom/Desktop/json_file_simplifier/InputFiles/1_13
-                                                       // Ex 2: /mnt/c/Users/Tom/Desktop/json_file_simplifier/InputFiles/1_13/acacia_boat.json
-        // 2d.
-        if (entry->is_regular_file()) {
-            std::vector<std::string> alphaNums = {};
+        if (entry.is_regular_file()) {
 
-            readInputFile(entryStr, alphaNums);
+            std::vector<std::string> alphaNums;
+
+            parseJsonFile(inputFilePath, alphaNums);
             
-            writeToOutputFile(outputEntryStr, alphaNums);
+            outputFilePath.replace_extension("txt"); // If file path is a regular file, convert the extension to txt.
+            writeJsonAsTxt(outputFilePath, alphaNums);
         }
     }
 }
@@ -202,14 +203,16 @@ Algorithm Steps of this Function:
         - This code assumes there are no quotes within quotes.
             * Ex: "  "minecraft:word" " in the files.
 */
-void readInputFile(const std::string &entryStr, std::vector<std::string> &alphaNums) {
+void parseJsonFile(const fs::path &inputFilePath, std::vector<std::string> &alphaNums) {
         // 1. 
-        std::ifstream inFile(entryStr);
+        std::ifstream inFile(inputFilePath);
 
         // 2.
         if (!inFile.is_open()) {
-            std::cout << entryStr << " couldn't be opened!\n"
-                << "Program stopped.\n";
+            std::cout << "The input file path below couldn't be opened:\n"
+                      << inputFilePath
+                      << "\n\n"
+                      << "Program stopped.\n";
                 exit(1);
         }
 
@@ -308,47 +311,33 @@ void readInputFile(const std::string &entryStr, std::vector<std::string> &alphaN
 
 /*
 Algorithm Steps of this Function:
-    1. Replace the old extension of the file in outputEntryStr to the desired output file extension (default: txt) if it isn't already.
-        - Determine position of last '.' in string and set that to an int variable.
-        - Declare a string variable containing the desired output file extension (default: txt).
-        - if program does not find the desired output file extension (default: txt) then erase the old extension and set the new one. 
-    
-    2. Open the filename using the outputEntryStr variable.
+    1. Open the filename using the outputFilePath variable.
 
-    3. Check if outFile properly opened. If not, give error and exit program.
+    2. Check if outFilePath properly opened. If not, give error and exit program.
 
-    4. Write to the output file.
+    3. Write to the output file.
         - For every word in the vec from the function argument, write it into the output file. 1 word per line (enclosed in "").
 
-    5. Close output file.
+    4. Close output file.
 */
-void writeToOutputFile(std::string &outputEntryStr, const std::vector<std::string> &alphaNums) {
+void writeJsonAsTxt(const fs::path &outFilePath, const std::vector<std::string> &alphaNums) {
     // 1.
-    int posOfextensionStart = outputEntryStr.find_last_of('.');
-    std::string desiredOutputExtension = "txt";
-    
-    // Remove old extension if not desired output extension then add desired output extension.
-    if (outputEntryStr.find(desiredOutputExtension) == std::string::npos) { // if desired output extension not found in string:
-        outputEntryStr.erase(outputEntryStr.begin()+posOfextensionStart+1, outputEntryStr.end());
-        outputEntryStr.append(desiredOutputExtension);
-    }
+    std::ofstream outFile(outFilePath);
 
     // 2.
-    std::ofstream outFile(outputEntryStr);
-
-    // 3.
     if (!outFile.is_open()) {
         std::cerr << "\nError! Could not open output file properly.\n"
-            << "Output file path: " << outputEntryStr << '\n'
+            << "Output file path:\n"
+            << outFilePath << '\n'
             << "Program is exiting...\n";
         exit(1);
     }
 
-    // 4.
+    // 3.
     for (std::string str : alphaNums) {
         outFile << str << std::endl;
     }
 
-    // 5.
+    // 4.
     outFile.close();
 }
