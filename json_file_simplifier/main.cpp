@@ -4,16 +4,19 @@ Project Purpose:
     - Will simplify JSON files to make them easier to read from.
 
 Program Name: main.cpp
-Version: 3
+Version: 3.0.1
 Author: Tommy Weber
-Date: 10/18/2019
+Date: 10/20/2019
 
 Latest Changes / Notes:
     - On 10/15/2019 I added support for storing integers that are outside of double quotes.
     - On 10/16/2019 I added support for storing doubles (like 0.0) that are outside of double quotes.
     - On 10/18/2019 I added support for recursive directory iterating.
-        * BUG: When 3 folders depth into InputFolder & OutputFolder, it will create the folders & file still but won't output data to the file. Example in: OutputFiles\firstDirectTest\2ndDirectTest\3rdDirectTest on local Desktop PC.
-    - Algorithm Steps and comments are up to date as of 10/18/2019 at 6:30 pm MDT.
+        * BUG: It will only get data from files within "InputFiles/<AFolderName>/<filename>.<ext>" but will NOT store the data of files in "InputFiles/<filename>.<ext>" or in a folder depth of greater than 1 folder inside InputFiles. It WILL create the files but they will be empty.
+    - On 10/20/2019 I made some code improvements. However, the bug from the previous version still exists.
+        * BUG: It will only get data from files within "InputFiles/<AFolderName>/<filename>.<ext>" but will NOT store the data of files in "InputFiles/<filename>.<ext>" or in a folder depth of greater than 1 folder inside InputFiles. It WILL create the files but they will be empty.
+         
+    - Algorithm Steps and comments are up to date I think as of 10/20/2019 at 2:59 pm MDT.
 
 -------------------------------
 Follow Good Practices:
