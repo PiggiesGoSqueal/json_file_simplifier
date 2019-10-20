@@ -13,6 +13,9 @@ Thus I made a program which will allow the user to store JSON files into a certa
 - V3: ~~Allow it to recursively find input files within the "InputFiles" directory. And recursively write output files in the "OutputFiles" directory.~~
 	* ~~That way, I could just add the "1.13" and "1.14" folders (with all MC recipe files in them) into "InputFiles" and have it do all of them in one run of the program. Would save time.~~
 
+## Bugs:
+- It will only get data from files within "InputFiles/<AFolderName>/<filename>.<ext>" but will NOT store the data of files in "InputFiles/<filename>.<ext>" or in a folder depth of greater than 1 folder inside InputFiles. It WILL create the files but they will be empty.
+
 ## Example Input File (.json):
 	{
 	  "type": "minecraft:crafting_shaped",
