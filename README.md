@@ -14,7 +14,11 @@ Thus I made a program which will allow the user to store JSON files into a certa
 	* ~~That way, I could just add the "1.13" and "1.14" folders (with all MC recipe files in them) into "InputFiles" and have it do all of them in one run of the program. Would save time.~~
 
 ## Bugs:
-- It will only get data from files within "InputFiles/<AFolderName>/<filename>.<ext>" but will NOT store the data of files in "InputFiles/<filename>.<ext>" or in a folder depth of greater than 1 folder inside InputFiles. It WILL create the files but they will be empty.
+- It will only get data from files within:
+	"InputFiles/<AFolderName>/<filename>.<ext>"
+but will NOT store the data of files in:
+	"InputFiles/<filename>.<ext>"
+or in a folder depth of greater than 1 folder inside InputFiles. It WILL create the files but they will be empty.
 
 ## Example Input File (.json):
 	{
